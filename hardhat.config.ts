@@ -48,10 +48,22 @@ const ETHEREUM_MAINNET_KEYS: string[] = process.env.ETHEREUM_MAINNET_KEYS ?
 const ETHEREUM_TESTNET_KEYS: string[] = process.env.ETHEREUM_TESTNET_KEYS ?
     process.env.ETHEREUM_TESTNET_KEYS.split(",") : [];
 // See `config.networks`.
-// const POLYGON_MAINNET_KEYS: string[] = process.env.POLYGON_MAINNET_KEYS ?
-//     process.env.POLYGON_MAINNET_KEYS.split(",") : [];
-// const POLYGON_TESTNET_KEYS: string[] = process.env.POLYGON_TESTNET_KEYS ?
-//     process.env.POLYGON_TESTNET_KEYS.split(",") : [];
+const POLYGON_MAINNET_KEYS: string[] = process.env.POLYGON_MAINNET_KEYS
+    ? process.env.POLYGON_MAINNET_KEYS.split(",")
+    : [];
+const POLYGON_TESTNET_KEYS: string[] = process.env.POLYGON_TESTNET_KEYS
+    ? process.env.POLYGON_TESTNET_KEYS.split(",")
+    : [];
+const ARBITRUM_MAINNET_KEYS: string[] = process.env.ARBITRUM_MAINNET_KEYS
+    ? process.env.ARBITRUM_MAINNET_KEYS.split(",")
+    : [];
+const ARBITRUM_TESTNET_KEYS: string[] = process.env.ARBITRUM_TESTNET_KEYS
+    ? process.env.ARBITRUM_TESTNET_KEYS.split(",")
+    : [];
+
+const ETHERSCAN_API_KEY: string = process.env.ETHERSCAN_API_KEY || "";
+const POLYGONSCAN_API_KEY: string = process.env.POLYGONSCAN_API_KEY || "";
+const ARBITRUM_API_KEY: string = process.env.ARBITRUM_API_KEY || "";
 
 /*
  * The solc compiler optimizer configuration. (The optimizer is disabled by default).
@@ -146,18 +158,28 @@ const config: HardhatUserConfig = {
         },
         sepolia: {
             url: process.env.SEPOLIA_URL || "",
-            accounts: [...ETHEREUM_TESTNET_KEYS]
-        } //,
-        // // Polygon.
-        // // Example of adding of other networks.
-        // polygon: {
-        //     url: process.env.POLYGON_URL || "",
-        //     accounts: [...POLYGON_MAINNET_KEYS]
-        // },
-        // mumbai: {
-        //     url:  process.env.MUMBAI_URL || "",
-        //     accounts: [...POLYGON_TESTNET_KEYS]
-        // }
+            accounts: [...ETHEREUM_TESTNET_KEYS],
+            gasPrice: 8000000000,
+            timeout: 60000
+        },
+        // Polygon.
+        // Example of adding of other networks.
+        polygon: {
+            url: process.env.POLYGON_URL || "",
+            accounts: [...POLYGON_MAINNET_KEYS]
+        },
+        mumbai: {
+            url: process.env.MUMBAI_URL || "",
+            accounts: [...POLYGON_TESTNET_KEYS]
+        },
+        arbitrum: {
+            url: process.env.ARBITRUM_URL || "",
+            accounts: [...ARBITRUM_MAINNET_KEYS]
+        },
+        arbitrumTestnet: {
+            url: process.env.ARBITRUM_TESTNET_URL || "",
+            accounts: [...ARBITRUM_TESTNET_KEYS]
+        }
     },
     contractSizer: {
         except: ["mocks/", "from-dependencies/"]
@@ -181,7 +203,7 @@ const config: HardhatUserConfig = {
         outputFile: process.env.GAS_REPORT_TO_FILE ? "gas-report.txt" : undefined
     },
     etherscan: {
-        apiKey: process.env.ETHERSCAN_API_KEY
+        // apiKey: process.env.ETHERSCAN_API_KEY,
         /*
          * If the project targets multiple EVM-compatible networks that have different explorers, then it is necessary
          * to set multiple API keys.
@@ -193,13 +215,23 @@ const config: HardhatUserConfig = {
          * See the link for details:
          * https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#multiple-api-keys-and-alternative-block-explorers.
          */
-        // apiKey: {
-        //     mainnet: "ETHERSCAN_API_KEY",
-        //     goerli: "ETHERSCAN_API_KEY",
-        //     sepolia: "ETHERSCAN_API_KEY",
-        //     polygon: "POLYGONSCAN_API_KEY",
-        //     polygonMumbai: "POLYGONSCAN_API_KEY"
-        // }
+        apiKey: {
+            mainnet: ETHERSCAN_API_KEY,
+            sepolia: ETHERSCAN_API_KEY,
+            polygon: POLYGONSCAN_API_KEY,
+            polygonMumbai: POLYGONSCAN_API_KEY,
+            arbitrumOne: ARBITRUM_API_KEY
+        },
+        customChains: [
+            {
+                network: "arbitrumTestnet",
+                chainId: 421614,
+                urls: {
+                    apiURL: "https://api-sepolia.arbiscan.io/api",
+                    browserURL: "https://arbiscan.io"
+                }
+            }
+        ]
     },
     abiExporter: {
         pretty: true,
