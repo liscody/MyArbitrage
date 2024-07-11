@@ -33,6 +33,7 @@ import "@openzeppelin/hardhat-upgrades";
 import "hardhat-dependency-compiler"; // See the comment for the field `dependencyCompiler` in `config`.
 import "solidity-docgen"; // The tool by OpenZeppelin to generate documentation for contracts in the Markdown format.
 
+import "./tasks/MyArbitrage";
 // See `README.md` for details.
 
 /*
@@ -68,7 +69,7 @@ const config: HardhatUserConfig = {
     solidity: {
         compilers: [
             {
-                version: "0.8.17",
+                version: "0.8.19",
                 settings: {
                     optimizer: {
                         enabled: ENABLED_OPTIMIZER,
@@ -85,13 +86,32 @@ const config: HardhatUserConfig = {
             //         }
             //     }
             // }
-        ] //,
-        // overrides: { // Example of specifying of a compiler for a specified contract.
-        //     "contracts/Foo.sol": {
-        //         version: "0.5.5",
-        //         settings: { }
-        //     }
-        // }
+        ],
+        overrides: {
+            "contracts/mocks/TetherMock.sol": {
+                version: "0.4.18",
+                settings: {}
+            },
+            "contracts/mocks/DaiMock.sol": {
+                version: "0.5.12",
+                settings: {}
+            },
+            "contracts/mocks/UsdcMock.sol": {
+                version: "0.6.12",
+                settings: {
+                    optimizer: {
+                        enabled: ENABLED_OPTIMIZER,
+                        runs: OPTIMIZER_RUNS
+                    }
+                }
+            }
+
+            // overrides: { // Example of specifying of a compiler for a specified contract.
+            //     "contracts/Foo.sol": {
+            //         version: "0.5.5",
+            //         settings: { }
+            //     }
+        }
     },
     // defaultNetwork: "hardhat",
     networks: {
@@ -106,7 +126,7 @@ const config: HardhatUserConfig = {
             forking: {
                 url: process.env.FORKING_URL || "",
                 enabled: process.env.FORKING !== undefined
-            }//,
+            } //,
             /*
              * Uncomment the line below if Ethers reports the error
              * "Error: cannot estimate gas; transaction may fail or may require manual gas limit...".
@@ -195,7 +215,7 @@ const config: HardhatUserConfig = {
             // "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol",
             // "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetFixedSupply.sol"
         ],
-        path: "./from-dependencies"//,
+        path: "./from-dependencies" //,
         /*
          * Required for Slither if something in `paths`. It is to keep temporary file directory after compilation is
          * complete.
